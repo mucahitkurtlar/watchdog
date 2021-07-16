@@ -78,6 +78,10 @@ func (b *Bot) HandleMessages() {
 
 		log.Printf("Message: %s From: %s\n", update.Message.Text, update.Message.From)
 		switch update.Message.Text {
+		case "/start":
+			msg.Text = "Welcome to " + b.TgBot.Self.FirstName + " " + b.TgBot.Self.LastName +
+				"\nUse /open command for control the home automation system through reply keyboard. You can use /close command to close the reply keyboard"
+			log.Println("LED turned on")
 		case "/open":
 			msg.ReplyMarkup = numericKeyboard
 			log.Println("Reply keyboard opened")
