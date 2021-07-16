@@ -89,7 +89,12 @@ func (b *Bot) HandleMessages() {
 			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 			log.Println("Reply keyboard closed")
 		case "LED Status":
-			if esp.AskStatus("http://led.local/status") {
+			status, err := esp.AskStatus("http://led.local/status")
+			if err != nil {
+				msg.Text = "Can't reach the target at the moment :("
+				break
+			}
+			if status {
 				msg.Text = "LED is ON"
 				log.Println("LED status asked and it's on")
 			} else {
@@ -113,7 +118,12 @@ func (b *Bot) HandleMessages() {
 				log.Println("An error has occurred while LED turning off")
 			}
 		case "Lamp Status":
-			if esp.AskStatus("http://lamp.local/status") {
+			status, err := esp.AskStatus("http://lamp.local/status")
+			if err != nil {
+				msg.Text = "Can't reach the target at the moment :("
+				break
+			}
+			if status {
 				msg.Text = "Lamp is ON"
 				log.Println("Lamp status asked and it's on")
 			} else {
