@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -22,7 +22,7 @@ var isMotionDetected bool
 
 func main() {
 	isMotionDetected = false
-	myBot := bot.CreateBot(secrets.BotToken)
+	myBot := bot.CreateBot(secrets.BotToken, secrets.ChatID)
 	go myBot.HandleMessages()
 	go func() {
 		lasDetect := time.Now()
@@ -40,6 +40,6 @@ func main() {
 
 	r := routes.NewRouter(&isMotionDetected)
 	http.Handle("/", r)
-	fmt.Println("Listening on port :8020")
+	log.Println("Listening on port :8020")
 	http.ListenAndServe(":8020", nil)
 }
