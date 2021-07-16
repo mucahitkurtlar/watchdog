@@ -2,6 +2,7 @@ package esp
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -19,7 +20,7 @@ type action struct {
 
 // Checks pin status and returns bool value
 // AskStatus exported
-func AskStatus(url string) bool {
+func AskStatus(url string) (bool, error) {
 	// Create client object
 	spaceClient := http.Client{
 		// Timeout after 5 seconds
@@ -39,7 +40,7 @@ func AskStatus(url string) bool {
 	res, getErr := spaceClient.Do(req)
 	if getErr != nil {
 		log.Println("Can't reach the target! Target link: ", url)
-		return false
+		return false, errors.New("can't reach the target url")
 	}
 
 	if res.Body != nil {
@@ -63,7 +64,7 @@ func AskStatus(url string) bool {
 	fmt.Println(status1.Status)
 
 	// Return the pin status
-	return status1.Status == 1
+	return status1.Status == 1, nil
 
 }
 
