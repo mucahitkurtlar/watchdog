@@ -33,14 +33,14 @@ type Bot struct {
 }
 
 // Creates a Bot object and returns its reference
-func CreateBot(secret string) *Bot {
+func CreateBot(secret string, chatID int64) *Bot {
 	tgBot, err := tgbotapi.NewBotAPI(secret)
 	if err != nil {
 		log.Fatal(err)
 	}
 	tgBot.Debug = false
 	log.Printf("Authorized on account %s", tgBot.Self.UserName)
-	bot := Bot{TgBot: tgBot}
+	bot := Bot{TgBot: tgBot, chatID: chatID}
 
 	return &bot
 }
@@ -67,8 +67,16 @@ func (b *Bot) HandleMessages() {
 		}
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		if update.Message.Chat.ID != b.chatID {
+			log.Printf("Unauthorized user %s tried to use this bot!\n", update.Message.From)
+			msg.Text = "I don't know who you are :/ Unauthorized attempt!"
+			if _, err := b.TgBot.Send(msg); err != nil {
+				log.Println("The message couldn't be sent! Message: ", msg.Text)
+			}
+			continue
+		}
 
-		log.Printf("Message: %s From %s\n", update.Message.Text, update.Message.From)
+		log.Printf("Message: %s From: %s\n", update.Message.Text, update.Message.From)
 		switch update.Message.Text {
 		case "/open":
 			msg.ReplyMarkup = numericKeyboard
@@ -125,7 +133,6 @@ func (b *Bot) HandleMessages() {
 				log.Println("An error has occurred while lamp turning off")
 			}
 		case "Sensor On":
-			b.chatID = update.Message.Chat.ID
 			b.isSensorOn = true
 			log.Println("Motion sensor set to on")
 		case "Sensor Off":
@@ -135,7 +142,6 @@ func (b *Bot) HandleMessages() {
 
 		if _, err := b.TgBot.Send(msg); err != nil {
 			log.Println("The message couldn't be sent! Message: ", msg.Text)
-			log.Panic(err)
 		}
 	}
 }
