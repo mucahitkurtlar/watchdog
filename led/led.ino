@@ -76,7 +76,7 @@ void loop(void) {
     Serial.println("Motion detected");
     // Creates http object to send a post request to main server
     HTTPClient http;
-    http.begin("http://192.168.2.145:8020/watch");
+    http.begin("http://raspberrypi.local:8020/watch");
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
     String httpRequestData = "move=ok";
     int httpResponseCode = http.POST(httpRequestData);
